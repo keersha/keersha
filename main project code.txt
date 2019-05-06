@@ -1,0 +1,194 @@
+#include <LiquidCrystal.h>
+const int rs = 13, en = 12, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+
+const int pingPin = 22;    // FRONT SENSOR
+const int echoPin = 24; 
+
+const int pingPin_1 = 26;    //SIDE SENSOR
+const int echoPin_1 = 28; 
+
+const int pingPin_2 = 30;    //BACK SENSOR
+const int echoPin_2 = 32; 
+
+
+int VOICE_1=6;
+int VOICE_2=7;
+int VOICE_3=8;
+int vibrator_1=36;
+int vibrator_2=38;
+
+
+
+void setup() 
+{
+
+    pinMode(VOICE_1,OUTPUT);
+    pinMode(VOICE_2,OUTPUT);
+    pinMode(VOICE_3,OUTPUT);
+     pinMode(vibrator_1,OUTPUT);
+      pinMode(vibrator_2,OUTPUT);
+
+    digitalWrite(VOICE_1,HIGH);
+    digitalWrite(VOICE_2,HIGH);
+    digitalWrite(VOICE_3,HIGH);
+    digitalWrite(vibrator_1,HIGH);
+    digitalWrite(vibrator_2,HIGH);
+    
+    Serial.begin(9600); 
+    lcd.clear();
+    lcd.begin(16, 2);
+    lcd.print("BLIND PERSON ");
+    lcd.setCursor(0, 1);
+    lcd.print("SPEECH GUIDANCE");
+    delay(1000);
+    lcd.clear();
+}
+
+void loop() 
+{
+      FRONT_SENSOR();
+      SIDE_SENSOR();
+      BACK_SENSOR();
+
+
+  
+}
+void FRONT_SENSOR()
+{
+   long duration, inches, cm;
+   pinMode(pingPin, OUTPUT);
+   digitalWrite(pingPin, LOW);
+   delayMicroseconds(2);
+   digitalWrite(pingPin, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(pingPin, LOW);
+   pinMode(echoPin, INPUT);
+   duration = pulseIn(echoPin, HIGH);
+   
+   cm = microsecondsToCentimeters(duration);
+  
+   Serial.print(cm);
+   Serial.print("cm");
+   Serial.println();
+ //  lcd.clear();
+   lcd.setCursor(0, 0);
+   lcd.print("F:");
+   lcd.print(cm);
+   lcd.print("cm");
+   delay(100);
+   if(cm<50)
+   {
+        lcd.clear();
+       lcd.print("FRONT OBEJECT");
+       lcd.print("DETECTED");
+       Serial.println("FRONT OBEJECT DETECTED");
+       digitalWrite(VOICE_1,LOW);
+       delay(1000);
+       digitalWrite(VOICE_1,HIGH);
+       digitalWrite(vibrator_1,LOW); 
+      digitalWrite(vibrator_2,LOW); 
+      delay(500);
+      digitalWrite(vibrator_1,HIGH);
+       digitalWrite(vibrator_2,HIGH);
+      
+     
+      
+   lcd.clear();
+   }
+  
+}
+
+void SIDE_SENSOR()
+{
+     long duration_1, inches_1, cm_1;
+   pinMode(pingPin_1, OUTPUT);
+   digitalWrite(pingPin_1, LOW);
+   delayMicroseconds(2);
+   digitalWrite(pingPin_1, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(pingPin_1, LOW);
+   pinMode(echoPin_1, INPUT);
+   duration_1 = pulseIn(echoPin_1, HIGH);
+   
+   cm_1 = microsecondsToCentimeters(duration_1);
+  
+   Serial.print(cm_1);
+   Serial.print("cm");
+   Serial.println();
+   delay(100);
+ //  lcd.clear();
+    lcd.setCursor(9, 0);
+   lcd.print("S:");
+     lcd.print(cm_1);
+   lcd.print("cm");
+   if(cm_1<50)
+   {
+        lcd.clear();
+       lcd.print("LEFT OBEJECT");
+       lcd.print("DETECTED");
+        Serial.println("LEFT OBEJECT DETECTED"); 
+        digitalWrite(vibrator_1,HIGH); 
+        digitalWrite(vibrator_2,LOW);
+        delay(500);
+
+      digitalWrite(vibrator_1,HIGH);
+       digitalWrite(vibrator_2,HIGH);
+      
+       digitalWrite(VOICE_2,LOW);
+       delay(1000);
+       digitalWrite(VOICE_2,HIGH);    
+   lcd.clear();
+   }
+  
+}
+void BACK_SENSOR()
+{
+   long duration_2, inches_2, cm_2;
+   pinMode(pingPin_2, OUTPUT);
+   digitalWrite(pingPin_2, LOW);
+   delayMicroseconds(2);
+   digitalWrite(pingPin_2, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(pingPin_2, LOW);
+   pinMode(echoPin_2, INPUT);
+   duration_2 = pulseIn(echoPin_2, HIGH);
+   
+   cm_2 = microsecondsToCentimeters(duration_2);
+  
+   Serial.print(cm_2);
+   Serial.print("cm");
+   Serial.println();
+ //  lcd.clear();
+    lcd.setCursor(0, 1);
+   lcd.print("B:");
+    lcd.print(cm_2);
+   lcd.print("cm");
+   delay(500);
+   if(cm_2<50)
+   {
+       lcd.clear();
+       lcd.print("BACK OBEJECT");
+       lcd.print("DETECTED"); 
+       Serial.println("BACK OBEJECT DETECTED");
+       digitalWrite(vibrator_1,LOW);
+      digitalWrite(vibrator_2,LOW); 
+      delay(500);
+      digitalWrite(vibrator_1,HIGH);
+       digitalWrite(vibrator_2,HIGH);
+      
+     
+      
+       digitalWrite(VOICE_3,LOW);
+       delay(2000);
+       digitalWrite(VOICE_3,HIGH);    
+        lcd.clear();  
+   
+   }
+  
+}
+long microsecondsToCentimeters(long microseconds) {
+   return microseconds / 29 / 2;
+}
+
